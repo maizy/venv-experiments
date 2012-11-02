@@ -1,15 +1,16 @@
 # _*_ coding: utf-8 _*_
 
+__copyright__ = 'Copyright 2012 maizy.ru'
+__author__ = 'Nikita Kovaliov <nikita@maizy.ru>'
+__license__ = 'MIT'
 __doc__ = 'init or update python venv (python 3.3+)'
 
 import venv
-import os
 import os.path as path
 import sys
 import urllib.request
 import urllib.error
 import subprocess
-import glob
 
 
 def download_file_if_not_exist(res_path, url):
@@ -69,13 +70,15 @@ class ImprovedEnvBuilder(venv.EnvBuilder, BuilderUtilsMixin):
 
 class EnvBuilder(ImprovedEnvBuilder):
 
-    def __init__(self, system_site_packages=False, clear=False, symlinks=False, upgrade=False):
+    def __init__(self, system_site_packages=False, clear=False,
+                 symlinks=False, upgrade=False):
         super().__init__(system_site_packages, clear, symlinks, upgrade)
         self.provisions_path = path.dirname(__file__)
 
     def post_setup(self, context):
         self.post_upgrade(context)
-        self.install_scripts(context, path.join(self.provisions_path, 'scripts'))
+        scripts_path = path.join(self.provisions_path, 'scripts')
+        self.install_scripts(context, scripts_path)
 
     def post_upgrade(self, context):
         if not path.exists(path.join(context.bin_path, 'pip')):
@@ -92,11 +95,16 @@ class EnvBuilder(ImprovedEnvBuilder):
     def install_distribute(self, context):
         print('[*] Installing distribute ... ', flush=True)
         res_path = path.join(self.provisions_path, 'distribute_setup.py')
-        if not download_file_if_not_exist(res_path, 'http://python-distribute.org/distribute_setup.py'):
-            sys.stdout.write('[!] Error: unable to download distribute install script\n')
+        downloaded = download_file_if_not_exist(
+            res_path,
+            'http://python-distribute.org/distribute_setup.py')
+        if not downloaded:
+            sys.stdout.write(
+                '[!] Error: unable to download distribute install script\n')
             return False
         if not self.run_in_venv(context, context.python_exe, [res_path]):
-            sys.stdout.write('[!] Error: when runnig distribute install script\n')
+            sys.stdout.write(
+                '[!] Error: when runnig distribute install script\n')
             return False
         return True
 
@@ -106,7 +114,6 @@ class EnvBuilder(ImprovedEnvBuilder):
         if not res:
             print('[!] Error', flush=True)
         return res
-
 
 
 def main(args):
@@ -120,11 +127,11 @@ def main(args):
         print('[*] Installing vevn on {}'.format(root_dir), flush=True)
     else:
         print('[*] Upgrating vevn on {}'.format(root_dir), flush=True)
-    
+
     builder = EnvBuilder(upgrade=upgrade)
     builder.create(root_dir)
 
     print('[*] Done', flush=True)
 
 if __name__ == '__main__':
-    sys.exit( main(sys.argv[1:]) )
+    sys.exit(main(sys.argv[1:]))

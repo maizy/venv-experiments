@@ -1,5 +1,10 @@
 #!__VENV_PYTHON__
 # _*_ coding: utf-8 _*_
+
+__copyright__ = 'Copyright 2012 maizy.ru'
+__author__ = 'Nikita Kovaliov <nikita@maizy.ru>'
+__license__ = 'MIT'
+
 import sys
 import test_venv
 
