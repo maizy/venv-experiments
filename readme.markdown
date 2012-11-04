@@ -1,6 +1,4 @@
-# Python 3.3 Venv experements
-
-Some python vevn experements.
+# Python 3.3 Venv experiments
 
 1. Custom env builder
 
